@@ -12,7 +12,6 @@ using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
@@ -216,20 +215,6 @@ namespace Microsoft.Identity.Web
                 user = _httpContextAccessor.HttpContext.User;
             }
 
-            if (user == null)
-            {
-                AuthenticationStateProvider? authenticationStateProvider =
-                    _serviceProvider.GetService(typeof(AuthenticationStateProvider))
-                    as AuthenticationStateProvider;
-
-                if (authenticationStateProvider != null)
-                {
-                    // AuthenticationState provider is only available in Blazor
-                    AuthenticationState state = await authenticationStateProvider.GetAuthenticationStateAsync().ConfigureAwait(false);
-                    user = state.User;
-                }
-            }
-
             if (scopes == null)
             {
                 throw new ArgumentNullException(nameof(scopes));
@@ -276,7 +261,7 @@ namespace Microsoft.Identity.Web
                 // AuthorizeForScopesAttribute exception filter so that the user can consent, do 2FA, etc ...
                 else
                 {
-                    throw;
+                    throw new MicrosoftIdentityWebChallengeUserException(ex, scopes.ToArray());
                 }
             }
 

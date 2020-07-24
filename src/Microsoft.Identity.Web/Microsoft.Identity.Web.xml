@@ -52,6 +52,32 @@
             </summary>
             <param name="context">Context provided by ASP.NET Core.</param>
         </member>
+        <member name="T:Microsoft.Identity.Web.BlazorHelper">
+            <summary>
+            Helper class for processing the user challenge in a Blazor app.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Identity.Web.BlazorHelper.ChallengeUserAsync(System.Exception,Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider,Microsoft.AspNetCore.Components.NavigationManager,System.String[],System.String)">
+            <summary>
+            Used on a controller action to trigger incremental consent.
+            </summary>
+            <param name="exception">Original exception.</param>
+            <param name="authenticationStateProvider">AuthenticationStateProvider specific for Blazor.</param>
+            <param name="navigationManager">NavigationManager.</param>
+            <param name="scopes">Scopes to request.</param>
+            <param name="nameOfPage">Name of Blazor page.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the result of the asynchronous operation.</returns>
+        </member>
+        <member name="M:Microsoft.Identity.Web.BlazorHelper.ChallengeUserAsync(Microsoft.Identity.Web.MicrosoftIdentityWebChallengeUserException,Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider,Microsoft.AspNetCore.Components.NavigationManager,System.String)">
+            <summary>
+            Used on a controller action to trigger incremental consent.
+            </summary>
+            <param name="microsoftIdentityWebChallengeUserException">MicrosoftIdentityWebChallengeUserException from the user challenge.</param>
+            <param name="authenticationStateProvider">AuthenticationStateProvider specific for Blazor.</param>
+            <param name="navigationManager">NavigationManager.</param>
+            /// <param name="nameOfPage">Name of Blazor page.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the result of the asynchronous operation.</returns>
+        </member>
         <member name="T:Microsoft.Identity.Web.CertificateDescription">
             <summary>
             Description of a certificate.
@@ -807,6 +833,30 @@
             (either via portal or PowerShell/CLI operation). For details see https://aka.ms/msal-net-sni.
             </summary>
             The default is <c>false.</c>
+        </member>
+        <member name="T:Microsoft.Identity.Web.MicrosoftIdentityWebChallengeUserException">
+            <summary>
+             Microsoft Identity Web specific exception class for
+             use in Blazor apps to process the user challenge.
+             Handles the <see cref="P:Microsoft.Identity.Web.MicrosoftIdentityWebChallengeUserException.MsalUiRequiredException"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Identity.Web.MicrosoftIdentityWebChallengeUserException.MsalUiRequiredException">
+            <summary>
+            Exception thrown by MSAL when a user challenge is encountered.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Identity.Web.MicrosoftIdentityWebChallengeUserException.Scopes">
+            <summary>
+            Scopes to request.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Identity.Web.MicrosoftIdentityWebChallengeUserException.#ctor(Microsoft.Identity.Client.MsalUiRequiredException,System.String[])">
+            <summary>
+            Handles the user challenge for Blazor.
+            </summary>
+            <param name="msalUiRequiredException">Exception thrown by MSAL when a user challenge is encountered.</param>
+            <param name="scopes">Scopes to request.</param>
         </member>
         <member name="T:Microsoft.Identity.Web.ObsoleteLegacyTokenDecryptCertificateParameter">
             <summary>
