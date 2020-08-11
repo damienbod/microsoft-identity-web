@@ -4,11 +4,12 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.Identity.Web
 {
     /// <summary>
-    /// Extensions for IServiceCollection for startup initialization of Web APIs.
+    /// Extensions for IServiceCollection for startup initialization of web APIs.
     /// </summary>
     public static class ServiceCollectionExtensions
     {
@@ -16,7 +17,7 @@ namespace Microsoft.Identity.Web
         /// Add the token acquisition service.
         /// </summary>
         /// <param name="services">Service collection.</param>
-        /// <param name="isTokenAcquisitionSingleton">Specifies if an instance of <see cref="ITokenAcquisition"/> should be a singleton.</param>
+        /// <param name="configureTokenAcquisitionOptions">Options for token acquisition service.</param>
         /// <returns>The service collection.</returns>
         /// <example>
         /// This method is typically called from the <c>ConfigureServices(IServiceCollection services)</c> in Startup.cs.
@@ -32,12 +33,21 @@ namespace Microsoft.Identity.Web
         /// </example>
         public static IServiceCollection AddTokenAcquisition(
             this IServiceCollection services,
-            bool isTokenAcquisitionSingleton = false)
+            Action<TokenAcquisitionOptions>? configureTokenAcquisitionOptions = null)
         {
             if (services == null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
+
+            services.Configure(configureTokenAcquisitionOptions);
+
+            services.AddOptions<TokenAcquisitionOptions>()
+                .Configure<IServiceProvider, IOptions<TokenAcquisitionOptions>>(
+                    (options, serviceProvider, tokenAcquisitionOptions) =>
+                {
+
+                });
 
             ServiceDescriptor? tokenAcquisitionService = services.FirstOrDefault(s => s.ServiceType == typeof(ITokenAcquisition));
             ServiceDescriptor? tokenAcquisitionInternalService = services.FirstOrDefault(s => s.ServiceType == typeof(ITokenAcquisitionInternal));
