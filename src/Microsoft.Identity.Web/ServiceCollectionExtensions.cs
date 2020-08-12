@@ -40,44 +40,49 @@ namespace Microsoft.Identity.Web
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.Configure(configureTokenAcquisitionOptions);
+            // Method 1
+            // var tokenOptions = new TokenAcquisitionOptions();
+            // configureTokenAcquisitionOptions?.Invoke(tokenOptions);
+            // var isTokenAcquisitionSingleton = tokenOptions.IsSingleton;
 
+            // Method 2
+            services.Configure<TokenAcquisitionOptions>(configureTokenAcquisitionOptions);
             services.AddOptions<TokenAcquisitionOptions>()
-                .Configure<IServiceProvider, IOptions<TokenAcquisitionOptions>>(
-                    (options, serviceProvider, tokenAcquisitionOptions) =>
+                .Configure<IServiceCollection, IOptions<TokenAcquisitionOptions>>(
+                    (options, serviceCollection, tokenAcquisitionOptions) =>
                 {
+                    var isTokenAcquisitionSingleton = tokenAcquisitionOptions.Value.IsSingleton;
 
+                    ServiceDescriptor? tokenAcquisitionService = services.FirstOrDefault(s => s.ServiceType == typeof(ITokenAcquisition));
+                    ServiceDescriptor? tokenAcquisitionInternalService = services.FirstOrDefault(s => s.ServiceType == typeof(ITokenAcquisitionInternal));
+                    if (tokenAcquisitionService != null && tokenAcquisitionInternalService != null)
+                    {
+                        if (isTokenAcquisitionSingleton ^ (tokenAcquisitionService.Lifetime == ServiceLifetime.Singleton))
+                        {
+                            // The service was already added, but not with the right lifetime
+                            services.Remove(tokenAcquisitionService);
+                            services.Remove(tokenAcquisitionInternalService);
+                        }
+                        else
+                        {
+                            // The service is already added with the right lifetime
+                            return;
+                        }
+                    }
+
+                    // Token acquisition service
+                    services.AddHttpContextAccessor();
+                    if (isTokenAcquisitionSingleton)
+                    {
+                        services.AddSingleton<ITokenAcquisition, TokenAcquisition>();
+                        services.AddSingleton<ITokenAcquisitionInternal>(serviceProvider => (ITokenAcquisitionInternal)serviceProvider.GetRequiredService<ITokenAcquisition>());
+                    }
+                    else
+                    {
+                        services.AddScoped<ITokenAcquisition, TokenAcquisition>();
+                        services.AddScoped<ITokenAcquisitionInternal>(serviceProvider => (ITokenAcquisitionInternal)serviceProvider.GetRequiredService<ITokenAcquisition>());
+                    }
                 });
-
-            ServiceDescriptor? tokenAcquisitionService = services.FirstOrDefault(s => s.ServiceType == typeof(ITokenAcquisition));
-            ServiceDescriptor? tokenAcquisitionInternalService = services.FirstOrDefault(s => s.ServiceType == typeof(ITokenAcquisitionInternal));
-            if (tokenAcquisitionService != null && tokenAcquisitionInternalService != null)
-            {
-                if (isTokenAcquisitionSingleton ^ (tokenAcquisitionService.Lifetime == ServiceLifetime.Singleton))
-                {
-                    // The service was already added, but not with the right lifetime
-                    services.Remove(tokenAcquisitionService);
-                    services.Remove(tokenAcquisitionInternalService);
-                }
-                else
-                {
-                    // The service is already added with the right lifetime
-                    return services;
-                }
-            }
-
-            // Token acquisition service
-            services.AddHttpContextAccessor();
-            if (isTokenAcquisitionSingleton)
-            {
-                services.AddSingleton<ITokenAcquisition, TokenAcquisition>();
-                services.AddSingleton<ITokenAcquisitionInternal>(s => (ITokenAcquisitionInternal)s.GetRequiredService<ITokenAcquisition>());
-            }
-            else
-            {
-                services.AddScoped<ITokenAcquisition, TokenAcquisition>();
-                services.AddScoped<ITokenAcquisitionInternal>(s => (ITokenAcquisitionInternal)s.GetRequiredService<ITokenAcquisition>());
-            }
 
             return services;
         }
