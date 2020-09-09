@@ -11,9 +11,10 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
         static void Main(string[] args)
         {
             //BenchmarkRunner.Run<TokenAcquisitionTests>(new DebugInProcessConfig());
-            BenchmarkSwitcher
-                .FromAssembly(typeof(Program).Assembly)
-                .Run(args, DefaultConfig.Instance.AddJob(Job.InProcess.WithToolchain(InProcessEmitToolchain.Instance)));
+            BenchmarkRunner.Run(typeof(Program).Assembly, DefaultConfig.Instance.AddJob(Job.InProcess.WithToolchain(InProcessEmitToolchain.Instance)));
+            //BenchmarkSwitcher
+            //    .FromAssembly(typeof(Program).Assembly)
+            //    .RunAll(DefaultConfig.Instance.AddJob(Job.InProcess.WithToolchain(InProcessEmitToolchain.Instance)));
             Console.ReadKey();
         }
     }
