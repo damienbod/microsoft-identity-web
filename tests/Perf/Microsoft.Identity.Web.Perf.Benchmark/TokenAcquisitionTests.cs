@@ -11,7 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.Identity.Web.Perf.Benchmark
 {
-    [SimpleJob(RunStrategy.Throughput, launchCount: 1, warmupCount: 0, targetCount: 1)]
+    //[SimpleJob(RunStrategy.Throughput, launchCount: 1, warmupCount: 0, targetCount: 1)]
+    [InProcessAttribute]
     public class TokenAcquisitionTests
     {
         private ITokenAcquisition _tokenAcquisition;
