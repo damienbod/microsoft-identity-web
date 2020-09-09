@@ -1,4 +1,6 @@
 ﻿using System;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Running;
 
 namespace Microsoft.Identity.Web.Perf.Benchmark
 {
@@ -6,7 +8,8 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            BenchmarkRunner.Run<TokenAcquisitionTests>();
+            Console.ReadKey();
         }
     }
 }
