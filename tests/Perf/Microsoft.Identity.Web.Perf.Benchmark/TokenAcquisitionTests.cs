@@ -22,11 +22,7 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
     //[InProcess]
     public class TokenAcquisitionTests
     {
-        private ITokenAcquisition _tokenAcquisition;
-        private ServiceProvider _serviceProvider;
         private WebApplicationFactory<Startup> _factory;
-        private IServiceScope _requestScope;
-        private HttpRequestMessage _httpRequestMessage;
         private HttpClient _client;
 
         public TokenAcquisitionTests()
@@ -42,6 +38,14 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
             {
                 AllowAutoRedirect = false,
             });
+            string accessToken = AcquireTokenForLabUserAsync().GetAwaiter().GetResult().AccessToken;
+            _client.DefaultRequestHeaders.Add(
+                "Authorization",
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} {1}",
+                    "Bearer",
+                    accessToken));
         }
 
         [GlobalCleanup]
@@ -51,31 +55,23 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
             _factory.Dispose();
         }
 
-        [IterationSetup]
-        public void IterationSetup()
-        {
-            var result = AcquireTokenForLabUserAsync().GetAwaiter().GetResult();
+        //[IterationSetup]
+        //public void IterationSetup()
+        //{
 
-            _httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, TestConstants.SecurePageGetTokenAsync);
-            _httpRequestMessage.Headers.Add(
-                "Authorization",
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0} {1}",
-                    "Bearer",
-                    result.AccessToken));
-        }
+        //}
 
-        [IterationCleanup]
-        public void IterationCleanup()
-        {
-            _httpRequestMessage.Dispose();
-        }
+        //[IterationCleanup]
+        //public void IterationCleanup()
+        //{
+
+        //}
 
         [Benchmark]
         public void GetAccessTokenForUserAsync()
         {
-            HttpResponseMessage response = _client.SendAsync(_httpRequestMessage).GetAwaiter().GetResult();
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, TestConstants.SecurePageGetTokenAsync);
+            HttpResponseMessage response = _client.SendAsync(httpRequestMessage).GetAwaiter().GetResult();
             if (!response.IsSuccessStatusCode)
             {
                 throw new Exception("Failed.");
