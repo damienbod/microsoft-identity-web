@@ -36,8 +36,8 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
                 DefaultConfig.Instance
                     .WithOptions(ConfigOptions.DontOverwriteResults)
                     .AddJob(
-                        Job.InProcess
-                            .WithToolchain(InProcessEmitToolchain.Instance)
+                        Job.Default
+                            //.WithToolchain(InProcessEmitToolchain.Instance)
                             .WithLaunchCount(1)
                             //.WithInvocationCount(1)
                             //.WithIterationCount(1)

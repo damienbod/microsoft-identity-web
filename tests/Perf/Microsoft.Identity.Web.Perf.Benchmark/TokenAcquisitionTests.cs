@@ -33,6 +33,7 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
         [GlobalSetup]
         public void GlobalSetup()
         {
+            Console.WriteLine($"-----------------------------------------Global Setup.");
             _client = _factory
             .CreateClient(new WebApplicationFactoryClientOptions
             {
@@ -70,7 +71,18 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
         [Benchmark]
         public void GetAccessTokenForUserAsync()
         {
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, TestConstants.SecurePageGetTokenAsync);
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, TestConstants.SecurePageGetTokenForUserAsync);
+            HttpResponseMessage response = _client.SendAsync(httpRequestMessage).GetAwaiter().GetResult();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed.");
+            }
+        }        
+        
+        [Benchmark]
+        public void GetAccessTokenForAppAsync()
+        {
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, TestConstants.SecurePageGetTokenForAppAsyncS);
             HttpResponseMessage response = _client.SendAsync(httpRequestMessage).GetAwaiter().GetResult();
             if (!response.IsSuccessStatusCode)
             {

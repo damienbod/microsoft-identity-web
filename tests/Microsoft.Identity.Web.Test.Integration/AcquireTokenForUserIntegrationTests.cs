@@ -30,7 +30,7 @@ namespace Microsoft.Identity.Web.Test.Integration
         private readonly WebApplicationFactory<Startup> _factory;
 
         [Theory]
-        [InlineData(TestConstants.SecurePageGetTokenAsync)]
+        [InlineData(TestConstants.SecurePageGetTokenForUserAsync)]
         //[InlineData(TestConstants.SecurePageCallDownstreamWebApi)]
         //[InlineData(TestConstants.SecurePageCallDownstreamWebApiGeneric)]
         //[InlineData(TestConstants.SecurePageCallMicrosoftGraph)]
