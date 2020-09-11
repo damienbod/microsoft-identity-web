@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -18,8 +19,6 @@ using Microsoft.Identity.Web.Test.LabInfrastructure;
 
 namespace Microsoft.Identity.Web.Perf.Benchmark
 {
-    //[SimpleJob(RunStrategy.Throughput, launchCount: 1, warmupCount: 0, targetCount: 1)]
-    //[InProcess]
     public class TokenAcquisitionTests
     {
         private WebApplicationFactory<Startup> _factory;
@@ -33,7 +32,7 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
         [GlobalSetup]
         public void GlobalSetup()
         {
-            Console.WriteLine($"-----------------------------------------Global Setup.");
+            CopyDependencies();
             _client = _factory
             .CreateClient(new WebApplicationFactoryClientOptions
             {
@@ -56,18 +55,6 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
             _factory.Dispose();
         }
 
-        //[IterationSetup]
-        //public void IterationSetup()
-        //{
-
-        //}
-
-        //[IterationCleanup]
-        //public void IterationCleanup()
-        //{
-
-        //}
-
         [Benchmark]
         public void GetAccessTokenForUserAsync()
         {
@@ -77,12 +64,12 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
             {
                 throw new Exception("Failed.");
             }
-        }        
-        
+        }
+
         [Benchmark]
         public void GetAccessTokenForAppAsync()
         {
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, TestConstants.SecurePageGetTokenForAppAsyncS);
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, TestConstants.SecurePageGetTokenForAppAsync);
             HttpResponseMessage response = _client.SendAsync(httpRequestMessage).GetAwaiter().GetResult();
             if (!response.IsSuccessStatusCode)
             {
@@ -109,6 +96,15 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
                 .ConfigureAwait(false);
 
             return authResult;
+        }
+
+        private void CopyDependencies()
+        {
+            // Copy IntegrationTestService.deps.json file
+            var filename = "IntegrationTestService.deps.json";
+            var dest = Path.Combine(Directory.GetCurrentDirectory(), filename);
+            var source = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\..\", filename);
+            File.Copy(source, dest, true);
         }
     }
 }

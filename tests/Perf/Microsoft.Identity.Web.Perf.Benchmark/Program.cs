@@ -18,35 +18,18 @@ namespace Microsoft.Identity.Web.Perf.Benchmark
         /// </remarks>
         static void Main(string[] args)
         {
-            //BenchmarkRunner.Run<TokenAcquisitionTests>(new DebugBuildConfig());
-            //BenchmarkRunner.Run(typeof(Program).Assembly,
-            //    new DebugBuildConfig()
-            //        .WithOptions(ConfigOptions.DisableOptimizationsValidator)
-            //        .AddJob(
-            //        Job.Default
-            //            .WithId("Job-TokenAcquisitionTests")
-            //            .WithLaunchCount(1)
-            //            .WithInvocationCount(1)
-            //            .WithIterationCount(1)
-            //            .WithWarmupCount(0)
-            //            .WithUnrollFactor(1)
-            //            ));
-
             BenchmarkRunner.Run(typeof(Program).Assembly,
                 DefaultConfig.Instance
                     .WithOptions(ConfigOptions.DontOverwriteResults)
                     .AddJob(
                         Job.Default
-                            //.WithToolchain(InProcessEmitToolchain.Instance)
+                            .WithId("Job-TokenAcquisitionTests")
                             .WithLaunchCount(1)
                             //.WithInvocationCount(1)
                             //.WithIterationCount(1)
                             //.WithWarmupCount(0)
-                            .WithUnrollFactor(1)
+                            //.WithUnrollFactor(1)
                             ));
-            //BenchmarkSwitcher
-            //    .FromAssembly(typeof(Program).Assembly)
-            //    .RunAll(DefaultConfig.Instance.AddJob(Job.InProcess.WithToolchain(InProcessEmitToolchain.Instance)));
             Console.ReadKey();
         }
     }
